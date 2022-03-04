@@ -25,17 +25,17 @@ const RestaurantCard = ({ data }) => {
     getPermissionAndLocation();
   }, [userLatitude, userLongitude]);
 
-  //   console.log({ userLatitude, userLongitude });
+  console.log({ userLatitude, userLongitude });
 
-  //   let distance = getDistance(
-  //     { latitude: data.location.lat, longitude: data.location.lng },
-  //     {
-  //       latitude: userLatitude,
-  //       longitude: userLongitude,
-  //     }
-  //   );
-  //   distance = Math.round((distance / 1000) * 100) / 100;
-  //   console.log({ distance });
+  let distance = getDistance(
+    { latitude: data.location.lat, longitude: data.location.lng },
+    {
+      latitude: userLatitude,
+      longitude: userLongitude,
+    }
+  );
+  distance = Math.round((distance / 1000) * 100) / 100;
+  console.log({ distance });
 
   const price = Math.floor(Math.random() * 3);
 
@@ -60,7 +60,12 @@ const RestaurantCard = ({ data }) => {
         <View style={styles.descTop}>
           <View style={styles.descTopLeft}>
             <Text
-              style={{ fontSize: 15, fontWeight: "bold", marginBottom: 10 }}
+              style={{
+                fontSize: 15,
+                fontWeight: "bold",
+                marginBottom: 10,
+                maxWidth: 250,
+              }}
             >
               {data.name}
             </Text>
@@ -73,7 +78,7 @@ const RestaurantCard = ({ data }) => {
           </View>
           <View style={styles.descTopRight}>
             <Text>{data.type}</Text>
-            {/* <Text style={{ fontSize: 12, color: "gray" }}>{distance} km</Text> */}
+            <Text style={{ fontSize: 12, color: "gray" }}>{distance} km</Text>
             {data.price && (
               <View style={styles.priceRange}>
                 <Text style={{ color: "gold" }}>$</Text>

@@ -91,7 +91,17 @@ export default function App() {
                         headerStyle: {
                           backgroundColor: "#6e3fac",
                         },
-                        headerTitle: "",
+                        headerTitle: () => (
+                          <Image
+                            source={{
+                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
+                            }}
+                            style={{
+                              width: 120,
+                              height: 40,
+                            }}
+                          />
+                        ),
                       }}
                       name="Map"
                     >

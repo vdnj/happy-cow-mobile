@@ -85,10 +85,12 @@ const RestaurantScreen = ({ route }) => {
   });
   // console.log({ images });
 
+  const price = Math.floor(Math.random() * 3);
+
   return isLoading ? (
     <SplashScreen />
   ) : (
-    <ScrollView>
+    <ScrollView style={{ backgroundColor: "white" }}>
       <View style={styles.basicInfo}>
         {showAllImages ? (
           <ScrollView
@@ -156,7 +158,14 @@ const RestaurantScreen = ({ route }) => {
           <View style={styles.rightBasicData}>
             <Text style={{ color: "white" }}>{route.params.data.type}</Text>
             <Text style={{ color: "white" }}>distance</Text>
-            <Text style={{ color: "white" }}>{route.params.data.price}</Text>
+            {route.params.data.price && (
+              <View style={styles.priceRange}>
+                <Text style={{ color: "gold" }}>$</Text>
+                <Text style={{ color: price >= 1 ? "gold" : "grey" }}>$</Text>
+                <Text style={{ color: price === 2 ? "gold" : "grey" }}>$</Text>
+              </View>
+            )}
+            <Text style={{ color: "white" }}></Text>
           </View>
         </View>
       </View>
@@ -251,17 +260,23 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "flex-start",
-    padding: 20,
+    padding: 15,
     backgroundColor: "#1fae9e",
   },
   moreInfo: {
-    padding: 20,
+    padding: 15,
   },
   links: {
     flexDirection: "row",
     alignItems: "center",
     borderBottomColor: "lightgray",
     borderBottomWidth: 1,
+  },
+  leftBasicData: {
+    alignItems: "flex-start",
+  },
+  priceRange: {
+    flexDirection: "row",
   },
 });
 
