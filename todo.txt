@@ -1,0 +1,9 @@
+Fix distance dans RestaurantCard
+Fix l'erreur quand on clique sur une RestaurantCard
+Gérer le display de tout le json restaurantsFull
+SplashScreen
+Fix la gestion des Favoris dans la page Favoris
+Créer les filtres
+
+Now :
+- Faire issue pour l'erreur et avancer sur la RestaurantScreen
