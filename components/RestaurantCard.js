@@ -70,8 +70,6 @@ const RestaurantCard = ({ data }) => {
               style={{ alignSelf: "flex-start" }}
               readonly={true}
             />
-
-            <Text>Opened?</Text>
           </View>
           <View style={styles.descTopRight}>
             <Text>{data.type}</Text>

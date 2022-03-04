@@ -4,13 +4,15 @@ import RestaurantCard from "../components/RestaurantCard";
 import restaurants from "../assets/restaurants.json";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import SplashScreen from "./SplashScreen";
+import { useIsFocused } from "@react-navigation/native";
 
 const FavoritesScreen = () => {
   const [favorites, setFavorites] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
+  const isFocused = useIsFocused();
+
   useEffect(() => {
-    console.log("entering useEffect");
     const getFavorites = async () => {
       setIsLoading(true);
       const favorites = await AsyncStorage.getItem("favorites");
@@ -28,7 +30,7 @@ const FavoritesScreen = () => {
       }
     };
     getFavorites();
-  }, []);
+  }, [isFocused]);
 
   return isLoading ? (
     <SplashScreen />
