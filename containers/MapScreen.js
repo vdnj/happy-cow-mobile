@@ -1,4 +1,4 @@
-import { View, Text } from "react-native";
+import { View, Text, Image } from "react-native";
 import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
@@ -55,7 +55,21 @@ const MapScreen = () => {
                 latitude: data.location.lat,
                 longitude: data.location.lng,
               }}
-            />
+            >
+              <Image
+                source={{
+                  uri:
+                    data.type === "vegan"
+                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
+                      : data.type === "vegetarian"
+                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
+                      : data.type === "Veg Store"
+                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
+                      : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
+                }}
+                style={{ height: 30, width: 30, borderRadius: 10 }}
+              />
+            </MapView.Marker>
           );
         })}
       </MapView>

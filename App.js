@@ -127,7 +127,25 @@ export default function App() {
               >
                 {() => (
                   <Stack.Navigator>
-                    <Stack.Screen name="Favorites">
+                    <Stack.Screen
+                      name="Favorites"
+                      options={{
+                        headerStyle: {
+                          backgroundColor: "#6e3fac",
+                        },
+                        headerTitle: () => (
+                          <Image
+                            source={{
+                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
+                            }}
+                            style={{
+                              width: 120,
+                              height: 40,
+                            }}
+                          />
+                        ),
+                      }}
+                    >
                       {() => <FavoritesScreen />}
                     </Stack.Screen>
                     <Stack.Screen
