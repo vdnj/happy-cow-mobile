@@ -16,15 +16,47 @@ import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import SplashScreen from "./SplashScreen";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Rating } from "react-native-elements";
+// import ImageView from "react-native-image-viewing";
 
 const RestaurantScreen = ({ route }) => {
   const [isFav, setIsFav] = useState(null);
+  const [visible, setIsVisible] = useState(false);
+  const [showAllImages, setShowAllImages] = useState(false);
 
   useEffect(async () => {
     let favorites = await AsyncStorage.getItem("favorites");
     const isInFavorites = favorites.includes(String(route.params.data.placeId));
     setIsFav(isInFavorites);
-  }, []);
+    navigation.setOptions({
+      headerStyle: {
+        backgroundColor: "#1fae9e",
+      },
+      headerTitle: "",
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={() => handleFavClic(route.params.data.placeId)}
+          title=""
+        >
+          <Ionicons
+            name={isFav ? "star" : "star-outline"}
+            size={20}
+            color={"white"}
+          />
+        </TouchableOpacity>
+      ),
+    });
+    const getPermissionAndLocation = async () => {
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status === "granted") {
+        const location = await Location.getCurrentPositionAsync();
+        setUserLatitude(location.coords.latitude);
+        setUserLongitude(location.coords.longitude);
+        setIsLoading(false);
+      }
+    };
+    getPermissionAndLocation();
+  }, [isFav]);
 
   const navigation = useNavigation();
 
@@ -43,76 +75,83 @@ const RestaurantScreen = ({ route }) => {
     await AsyncStorage.setItem("favorites", splittedFav.join("-"));
   };
 
-  navigation.setOptions({
-    headerStyle: {
-      backgroundColor: "#1fae9e",
-    },
-    headerTitle: "",
-    headerRight: () => (
-      <TouchableOpacity
-        onPress={() => handleFavClic(route.params.data.placeId)}
-        title=""
-      >
-        <Ionicons
-          name={isFav ? "star" : "star-outline"}
-          size={20}
-          color={"white"}
-        />
-      </TouchableOpacity>
-    ),
-  });
-
   const [userLatitude, setUserLatitude] = useState(null);
   const [userLongitude, setUserLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  useEffect(() => {
-    const getPermissionAndLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync();
-        setUserLatitude(location.coords.latitude);
-        setUserLongitude(location.coords.longitude);
-        setIsLoading(false);
-      }
-    };
-    getPermissionAndLocation();
-  }, []);
+  const images = [];
+  route.params.data.pictures.forEach((pic) => {
+    images.push({ uri: pic });
+  });
+  // console.log({ images });
 
   return isLoading ? (
     <SplashScreen />
   ) : (
     <ScrollView>
       <View style={styles.basicInfo}>
-        <View style={styles.pictures}>
-          <Image
-            source={{ uri: route.params.data.pictures[0] }}
-            style={styles.bigPic}
-          />
-          <View>
+        {showAllImages ? (
+          <ScrollView
+            horizontal={true}
+            showsHorizontalScrollIndicator={false}
+            style={{ backgroundColor: "#1fae9e" }}
+          >
+            {route.params.data.pictures.map((pic, index) => {
+              return (
+                <Image
+                  key={index}
+                  source={{ uri: pic }}
+                  style={{
+                    height: 200,
+                    width: Dimensions.get("window").width * 0.96,
+                    margin: Dimensions.get("window").width * 0.02,
+                  }}
+                />
+              );
+            })}
+          </ScrollView>
+        ) : (
+          <View style={styles.pictures}>
             <Image
-              source={{ uri: route.params.data.pictures[1] }}
-              style={styles.sideTopPic}
+              source={{ uri: route.params.data.pictures[0] }}
+              style={styles.bigPic}
             />
-            <TouchableOpacity>
-              <ImageBackground
-                source={{ uri: route.params.data.pictures[2] }}
-                style={styles.sideBotPic}
+            <View>
+              <Image
+                source={{ uri: route.params.data.pictures[1] }}
+                style={styles.sideTopPic}
+              />
+              <TouchableOpacity
+                onPress={() => {
+                  setShowAllImages(true);
+                }}
               >
-                <View style={styles.picsView}>
-                  <Text style={styles.seeAllText}>
-                    +{route.params.data.pictures.length}
-                  </Text>
-                </View>
-              </ImageBackground>
-            </TouchableOpacity>
+                <ImageBackground
+                  source={{ uri: route.params.data.pictures[2] }}
+                  style={styles.sideBotPic}
+                >
+                  <View style={styles.picsView}>
+                    <Text style={styles.seeAllText}>
+                      +{route.params.data.pictures.length}
+                    </Text>
+                  </View>
+                </ImageBackground>
+              </TouchableOpacity>
+            </View>
           </View>
-        </View>
+        )}
+
         <View style={styles.basicData}>
           <View style={styles.leftBasicData}>
-            <Text style={{ color: "white" }}>{route.params.data.name}</Text>
-            <Text>{route.params.data.rating}</Text>
-            <Text style={{ color: "white" }}>OPENENED ?</Text>
+            <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
+              {route.params.data.name}
+            </Text>
+            <Rating
+              startingValue={route.params.data.rating}
+              imageSize={15}
+              tintColor={"#1fae9e"}
+              readonly={true}
+            />
           </View>
           <View style={styles.rightBasicData}>
             <Text style={{ color: "white" }}>{route.params.data.type}</Text>
@@ -121,9 +160,7 @@ const RestaurantScreen = ({ route }) => {
           </View>
         </View>
       </View>
-
       <Text style={styles.moreInfo}>{route.params.data.description}</Text>
-
       <MapView
         style={{ width: "100%", height: 300 }}
         initialRegion={{
@@ -213,7 +250,7 @@ const styles = StyleSheet.create({
   basicData: {
     flexDirection: "row",
     justifyContent: "space-between",
-    alignItems: "flex-end",
+    alignItems: "flex-start",
     padding: 20,
     backgroundColor: "#1fae9e",
   },

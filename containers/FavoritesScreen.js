@@ -1,4 +1,4 @@
-import { View, Text, FlatList } from "react-native";
+import { ScrollView, Text, FlatList } from "react-native";
 import { useEffect, useState } from "react";
 import RestaurantCard from "../components/RestaurantCard";
 import restaurants from "../assets/restaurants.json";
@@ -33,15 +33,14 @@ const FavoritesScreen = () => {
   return isLoading ? (
     <SplashScreen />
   ) : (
-    <View>
-      <FlatList
-        data={favorites}
-        keyExtractor={(item) => item.placeId}
-        renderItem={({ item }) => {
-          return <RestaurantCard data={item} />;
-        }}
-      />
-    </View>
+    <FlatList
+      data={favorites}
+      keyExtractor={(item) => item.placeId}
+      renderItem={({ item }) => {
+        return <RestaurantCard data={item} />;
+      }}
+      style={{ backgroundColor: "white" }}
+    />
   );
 };
 

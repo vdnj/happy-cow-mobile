@@ -1,6 +1,6 @@
 import { View, Text, Image, TouchableOpacity, StyleSheet } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { Rating } from "react-native-ratings";
+import { Rating } from "react-native-elements";
 import { getDistance } from "geolib";
 import { useState, useEffect } from "react";
 import SplashScreen from "../containers/SplashScreen";
@@ -25,7 +25,7 @@ const RestaurantCard = ({ data }) => {
     getPermissionAndLocation();
   }, [userLatitude, userLongitude]);
 
-  console.log({ userLatitude, userLongitude });
+  //   console.log({ userLatitude, userLongitude });
 
   //   let distance = getDistance(
   //     { latitude: data.location.lat, longitude: data.location.lng },
@@ -38,7 +38,6 @@ const RestaurantCard = ({ data }) => {
   //   console.log({ distance });
 
   const price = Math.floor(Math.random() * 3);
-  console.log({ price });
 
   return isLoading ? (
     <SplashScreen />
@@ -69,6 +68,7 @@ const RestaurantCard = ({ data }) => {
               startingValue={data.rating}
               imageSize={15}
               style={{ alignSelf: "flex-start" }}
+              readonly={true}
             />
 
             <Text>Opened?</Text>
