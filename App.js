@@ -13,6 +13,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import { Ionicons, Feather } from "@expo/vector-icons";
 import { useState, useEffect } from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,6 +26,23 @@ import RestaurantsScreen from "./containers/RestaurantsScreen";
 import SplashScreen from "./containers/SplashScreen";
 
 export default function App() {
+  // const [isLoading, setIsLoading] = useState(true);
+  // const [userToken, setUserToken] = useState(null);
+
+  // useEffect(() => {
+  //   const bootstrapAsync = async () => {
+  //     const userToken = await AsyncStorage.getItem("userToken");
+  //     setUserToken(userToken);
+  //     setIsLoading(false);
+  //   };
+
+  //   bootstrapAsync();
+  // }, []);
+
+  // if (isLoading === true) {
+  //   return null;
+  // }
+
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -60,7 +78,7 @@ export default function App() {
                         headerTitle: () => (
                           <Image
                             source={{
-                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
+                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/HappyCow/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
                             }}
                             style={{
                               width: 120,
@@ -94,7 +112,7 @@ export default function App() {
                         headerTitle: () => (
                           <Image
                             source={{
-                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
+                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/HappyCow/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
                             }}
                             style={{
                               width: 120,
@@ -136,7 +154,7 @@ export default function App() {
                         headerTitle: () => (
                           <Image
                             source={{
-                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
+                              uri: "https://res.cloudinary.com/dxla31aiu/image/upload/v1646399899/HappyCow/Capture_d_e%CC%81cran_2022-03-04_a%CC%80_14.17.39_p9k9ug.png",
                             }}
                             style={{
                               width: 120,

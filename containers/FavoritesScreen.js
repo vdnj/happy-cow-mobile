@@ -34,7 +34,7 @@ const FavoritesScreen = () => {
 
   return isLoading ? (
     <SplashScreen />
-  ) : (
+  ) : favorites ? (
     <FlatList
       data={favorites}
       keyExtractor={(item) => item.placeId}
@@ -43,6 +43,10 @@ const FavoritesScreen = () => {
       }}
       style={{ backgroundColor: "white" }}
     />
+  ) : (
+    <View>
+      <Text>No Favorites to display !</Text>
+    </View>
   );
 };
 

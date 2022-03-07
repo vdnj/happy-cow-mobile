@@ -17,12 +17,28 @@ import SplashScreen from "./SplashScreen";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Rating } from "react-native-elements";
+import { getDistance } from "geolib";
+
 // import ImageView from "react-native-image-viewing";
 
 const RestaurantScreen = ({ route }) => {
+  const navigation = useNavigation();
   const [isFav, setIsFav] = useState(null);
   const [visible, setIsVisible] = useState(false);
   const [showAllImages, setShowAllImages] = useState(false);
+  const [userLatitude, setUserLatitude] = useState(null);
+  const [userLongitude, setUserLongitude] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [distance, setDistance] = useState(null);
+
+  const color =
+    route.params.data.type === "vegan"
+      ? "#479d5f"
+      : route.params.data.type === "vegetarian"
+      ? "#7f3a88"
+      : route.params.data.type === "Veg Store"
+      ? "#ddc252"
+      : "#49baaf";
 
   useEffect(async () => {
     let favorites = await AsyncStorage.getItem("favorites");
@@ -30,7 +46,7 @@ const RestaurantScreen = ({ route }) => {
     setIsFav(isInFavorites);
     navigation.setOptions({
       headerStyle: {
-        backgroundColor: "#1fae9e",
+        backgroundColor: color,
       },
       headerTitle: "",
       headerRight: () => (
@@ -52,13 +68,26 @@ const RestaurantScreen = ({ route }) => {
         const location = await Location.getCurrentPositionAsync();
         setUserLatitude(location.coords.latitude);
         setUserLongitude(location.coords.longitude);
+
+        let newDistance = getDistance(
+          {
+            latitude: route.params.data.location.lat,
+            longitude: route.params.data.location.lng,
+          },
+          {
+            latitude: location.coords.latitude,
+            longitude: location.coords.longitude,
+          }
+        );
+        newDistance = Math.round((newDistance / 1000) * 100) / 100;
+
+        setDistance(newDistance);
+
         setIsLoading(false);
       }
     };
     getPermissionAndLocation();
   }, [isFav]);
-
-  const navigation = useNavigation();
 
   const handleFavClic = async (id) => {
     const favorites = await AsyncStorage.getItem("favorites");
@@ -75,15 +104,10 @@ const RestaurantScreen = ({ route }) => {
     await AsyncStorage.setItem("favorites", splittedFav.join("-"));
   };
 
-  const [userLatitude, setUserLatitude] = useState(null);
-  const [userLongitude, setUserLongitude] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-
   const images = [];
   route.params.data.pictures.forEach((pic) => {
     images.push({ uri: pic });
   });
-  // console.log({ images });
 
   const price = Math.floor(Math.random() * 3);
 
@@ -96,7 +120,7 @@ const RestaurantScreen = ({ route }) => {
           <ScrollView
             horizontal={true}
             showsHorizontalScrollIndicator={false}
-            style={{ backgroundColor: "#1fae9e" }}
+            style={{ backgroundColor: color }}
           >
             {route.params.data.pictures.map((pic, index) => {
               return (
@@ -143,7 +167,14 @@ const RestaurantScreen = ({ route }) => {
           </View>
         )}
 
-        <View style={styles.basicData}>
+        <View
+          style={[
+            styles.basicData,
+            {
+              backgroundColor: color,
+            },
+          ]}
+        >
           <View style={styles.leftBasicData}>
             <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
               {route.params.data.name}
@@ -151,13 +182,27 @@ const RestaurantScreen = ({ route }) => {
             <Rating
               startingValue={route.params.data.rating}
               imageSize={15}
-              tintColor={"#1fae9e"}
+              tintColor={color}
               readonly={true}
             />
           </View>
           <View style={styles.rightBasicData}>
+            <Image
+              source={{
+                uri:
+                  route.params.data.type === "vegan"
+                    ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
+                    : route.params.data.type === "vegetarian"
+                    ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
+                    : route.params.data.type === "Veg Store"
+                    ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
+                    : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
+              }}
+              style={styles.typeLogo}
+            />
             <Text style={{ color: "white" }}>{route.params.data.type}</Text>
-            <Text style={{ color: "white" }}>distance</Text>
+            <Text style={{ fontSize: 12, color: "white" }}>{distance} km</Text>
+
             {route.params.data.price && (
               <View style={styles.priceRange}>
                 <Text style={{ color: "gold" }}>$</Text>
@@ -186,7 +231,21 @@ const RestaurantScreen = ({ route }) => {
             latitude: route.params.data.location.lat,
             longitude: route.params.data.location.lng,
           }}
-        />
+        >
+          <Image
+            source={{
+              uri:
+                route.params.data.type === "vegan"
+                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
+                  : route.params.data.type === "vegetarian"
+                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
+                  : route.params.data.type === "Veg Store"
+                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
+                  : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
+            }}
+            style={{ height: 30, width: 30, borderRadius: 10 }}
+          />
+        </MapView.Marker>
       </MapView>
       {route.params.data.phone && (
         <TouchableOpacity
@@ -275,8 +334,21 @@ const styles = StyleSheet.create({
   leftBasicData: {
     alignItems: "flex-start",
   },
+  rightBasicData: {
+    position: "relative",
+  },
   priceRange: {
     flexDirection: "row",
+  },
+  typeLogo: {
+    height: 30,
+    width: 30,
+    borderRadius: 15,
+    borderWidth: 1,
+    borderColor: "white",
+    position: "absolute",
+    top: -30,
+    right: 0,
   },
 });
 

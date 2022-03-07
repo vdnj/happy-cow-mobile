@@ -1,9 +1,5 @@
-Fix distance dans RestaurantCard
-Fix l'erreur quand on clique sur une RestaurantCard
-Gérer le display de tout le json restaurantsFull
-SplashScreen
-Fix la gestion des Favoris dans la page Favoris
-Créer les filtres
-Rating non modifiable
+Filtre par nom de restaurant
 login / signup
-Openend ?
+handle location not alowed
+bouton charger + Map
+Modifier tous les price du restaurants.json par 0,1 ou 2 aléatoirement et y accéder dans le restaurantCard et Screen pour qu'il ne se modifie plus

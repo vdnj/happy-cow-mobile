@@ -3,13 +3,11 @@ import { useNavigation } from "@react-navigation/native";
 import { Rating } from "react-native-elements";
 import { getDistance } from "geolib";
 import { useState, useEffect } from "react";
-import SplashScreen from "../containers/SplashScreen";
+import SplashCard from "../components/SplashCard";
 import * as Location from "expo-location";
 
 const RestaurantCard = ({ data }) => {
   const navigation = useNavigation();
-  //   const [userLatitude, setUserLatitude] = useState(null);
-  //   const [userLongitude, setUserLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [distance, setDistance] = useState(null);
 
@@ -18,41 +16,30 @@ const RestaurantCard = ({ data }) => {
       const { status } = await Location.requestForegroundPermissionsAsync();
       if (status === "granted") {
         const location = await Location.getCurrentPositionAsync();
-        // setUserLatitude(location.coords.latitude);
-        // setUserLongitude(location.coords.longitude);
-        const newDistance = getDistance(
+        let newDistance = getDistance(
           { latitude: data.location.lat, longitude: data.location.lng },
           {
             latitude: location.coords.latitude,
             longitude: location.coords.longitude,
           }
         );
-        newDistance = Math.round((distance / 1000) * 100) / 100;
+
+        newDistance = Math.round((newDistance / 1000) * 100) / 100;
+
         setDistance(newDistance);
 
         setIsLoading(false);
+      } else {
+        alert("Activez la localisation");
       }
     };
     getPermissionAndLocation();
   }, []);
-  console.log({ distance });
-
-  //   console.log({ userLatitude, userLongitude });
-
-  //   let distance = getDistance(
-  //     { latitude: data.location.lat, longitude: data.location.lng },
-  //     {
-  //       latitude: userLatitude,
-  //       longitude: userLongitude,
-  //     }
-  //   );
-  //   distance = Math.round((distance / 1000) * 100) / 100;
-  //   console.log({ distance });
 
   const price = Math.floor(Math.random() * 3);
 
   return isLoading ? (
-    <SplashScreen />
+    <SplashCard />
   ) : (
     <TouchableOpacity
       style={styles.card}
