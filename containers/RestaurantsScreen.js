@@ -7,18 +7,30 @@ import {
   StyleSheet,
   Dimensions,
 } from "react-native";
-import restaurants from "../assets/restaurantsFull.json";
+// import restaurants from "../assets/restaurantsFull.json";
 import RestaurantCard from "../components/RestaurantCard";
+import SplashScreen from "./SplashScreen";
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const RestaurantsScreen = ({ navigation }) => {
   const [filter, setFilter] = useState(null);
+  const [restaurants, setRestaurants] = useState(null);
   const [data, setData] = useState(null);
   const [actualShowing, setActualShowing] = useState(6);
+  const [isLoading, setIsLoading] = useState(true);
 
   let showingValue = 6;
 
   useEffect(() => {
+    const fetchRestaurants = async () => {
+      console.log("ENTERING FETCHRESTAURANTS");
+      const restaurants = await axios.get("http://localhost:3000/restaurants");
+      console.log(restaurants.data.length);
+      setRestaurants(restaurants.data);
+    };
+    fetchRestaurants();
+
     let newData;
 
     if (filter === "Other") {
@@ -39,7 +51,8 @@ const RestaurantsScreen = ({ navigation }) => {
     }
 
     setData(newData);
-  }, [filter]);
+    setIsLoading(false);
+  }, [filter, restaurants]);
 
   const handleFilterClick = (filterClicked) => {
     filter === filterClicked ? setFilter(null) : setFilter(filterClicked);
@@ -76,7 +89,9 @@ const RestaurantsScreen = ({ navigation }) => {
     setActualShowing(newActualShowing);
   };
 
-  return (
+  return isLoading ? (
+    <SplashScreen />
+  ) : (
     <View>
       <View style={styles.filters}>
         <TouchableOpacity
