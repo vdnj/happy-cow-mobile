@@ -44,14 +44,17 @@ const SignUpScreen = ({ setToken }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/user/signup", {
-        email,
-        password,
-        username,
-        vegStatus,
-        city,
-        yearOfBirth,
-      });
+      const response = await axios.post(
+        "https://happy-cow-backend.herokuapp.com/user/signup",
+        {
+          email,
+          password,
+          username,
+          vegStatus,
+          city,
+          yearOfBirth,
+        }
+      );
       const userToken = response.data.token;
       setToken(userToken);
     } catch (error) {

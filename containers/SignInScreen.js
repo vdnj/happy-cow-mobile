@@ -24,10 +24,13 @@ const SignInScreen = ({ setToken }) => {
 
   const handleSubmit = async () => {
     try {
-      const response = await axios.post("http://localhost:3000/user/login", {
-        email,
-        password,
-      });
+      const response = await axios.post(
+        "https://happy-cow-backend.herokuapp.com/user/login",
+        {
+          email,
+          password,
+        }
+      );
       const userToken = response.data.token;
       setToken(userToken);
     } catch (error) {
