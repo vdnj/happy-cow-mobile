@@ -15,44 +15,27 @@ import axios from "axios";
 
 const RestaurantsScreen = ({ navigation }) => {
   const [filter, setFilter] = useState(null);
-  const [restaurants, setRestaurants] = useState(null);
   const [data, setData] = useState(null);
   const [actualShowing, setActualShowing] = useState(6);
   const [isLoading, setIsLoading] = useState(true);
 
-  let showingValue = 6;
+  const showingValue = 6;
 
   useEffect(() => {
-    const fetchRestaurants = async () => {
-      console.log("ENTERING FETCHRESTAURANTS");
-      const restaurants = await axios.get("http://localhost:3000/restaurants");
-      console.log(restaurants.data.length);
-      setRestaurants(restaurants.data);
+    const fetchData = async () => {
+      try {
+        const data = await axios.get(
+          `http://localhost:3000/restaurants?filter=${filter}&actualShowing=${actualShowing}`
+        );
+        const newData = data.data;
+        setData(newData);
+      } catch (error) {
+        console.log(error.message);
+      }
     };
-    fetchRestaurants();
-
-    let newData;
-
-    if (filter === "Other") {
-      newData = restaurants
-        .filter(
-          (el) =>
-            el.type !== "vegan" &&
-            el.type !== "vegetarian" &&
-            el.type !== "Veg Store"
-        )
-        .slice(0, actualShowing);
-    } else if (filter) {
-      newData = restaurants
-        .filter((el) => el.type === filter)
-        .slice(0, actualShowing);
-    } else {
-      newData = restaurants.slice(0, actualShowing);
-    }
-
-    setData(newData);
+    fetchData();
     setIsLoading(false);
-  }, [filter, restaurants]);
+  }, [filter, actualShowing]);
 
   const handleFilterClick = (filterClicked) => {
     filter === filterClicked ? setFilter(null) : setFilter(filterClicked);
@@ -60,31 +43,6 @@ const RestaurantsScreen = ({ navigation }) => {
   };
 
   const handleLoadMore = () => {
-    const newData = [...data];
-    let dataToAdd;
-
-    if (filter === "Other") {
-      dataToAdd = restaurants
-        .filter(
-          (el) =>
-            el.type !== "vegan" &&
-            el.type !== "vegetarian" &&
-            el.type !== "Veg Store"
-        )
-        .slice(actualShowing, actualShowing + showingValue);
-    } else if (filter) {
-      dataToAdd = restaurants
-        .filter((el) => el.type === filter)
-        .slice(actualShowing, actualShowing + showingValue);
-    } else {
-      dataToAdd = restaurants.slice(
-        actualShowing,
-        actualShowing + showingValue
-      );
-    }
-
-    dataToAdd.forEach((el) => newData.push(el));
-    setData(newData);
     const newActualShowing = actualShowing + showingValue;
     setActualShowing(newActualShowing);
   };

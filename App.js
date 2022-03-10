@@ -130,18 +130,33 @@ export default function App() {
                               }}
                             />
                           ),
-                          headerRight: () => (
-                            <TouchableOpacity
-                              onPress={() => navigation.navigate("Map")}
-                              title=""
-                            >
-                              <Ionicons
-                                name="map-outline"
-                                size={20}
-                                color={"white"}
-                              />
-                            </TouchableOpacity>
-                          ),
+                          headerRight: () => {
+                            return (
+                              <>
+                                <TouchableOpacity
+                                  onPress={() => navigation.navigate("Map")}
+                                  title=""
+                                >
+                                  <Ionicons
+                                    name="map-outline"
+                                    size={20}
+                                    color={"white"}
+                                  />
+                                </TouchableOpacity>
+                                <TouchableOpacity
+                                  onPress={() => setToken(null)}
+                                  title=""
+                                  style={{ marginLeft: 10 }}
+                                >
+                                  <Ionicons
+                                    name="power-outline"
+                                    size={20}
+                                    color={"white"}
+                                  />
+                                </TouchableOpacity>
+                              </>
+                            );
+                          },
                         })}
                         name="Restaurants"
                       >

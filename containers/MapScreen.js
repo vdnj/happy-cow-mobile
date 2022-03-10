@@ -1,9 +1,10 @@
-import { View, Text, Image } from "react-native";
+import { View, Text, Image, TouchableOpacity } from "react-native";
 import { useState, useEffect } from "react";
 import * as Location from "expo-location";
 import MapView, { PROVIDER_GOOGLE } from "react-native-maps";
 import SplashScreen from "./SplashScreen";
-import restaurants from "../assets/restaurants.json";
+import axios from "axios";
+import Map from "../components/Map";
 
 import { useNavigation } from "@react-navigation/native";
 
@@ -13,67 +14,62 @@ const MapScreen = () => {
   const [userLatitude, setUserLatitude] = useState(null);
   const [userLongitude, setUserLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [actualShowing, setActualShowing] = useState(6);
 
   useEffect(() => {
-    const getPermissionAndLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync();
-        setUserLatitude(location.coords.latitude);
-        setUserLongitude(location.coords.longitude);
-        setIsLoading(false);
+    const fetchData = async () => {
+      try {
+        const data = await axios.get(
+          `http://localhost:3000/restaurants?filter=null&actualShowing=${actualShowing}`
+        );
+        const newData = data.data;
+        setData(newData);
+      } catch (error) {
+        console.log(error.message);
       }
     };
-    getPermissionAndLocation();
-  }, []);
+    fetchData();
+
+    setIsLoading(false);
+  }, [actualShowing]);
 
   return isLoading ? (
     <SplashScreen />
   ) : (
-    <View>
-      <MapView
-        style={{ width: "100%", height: "100%" }}
-        initialRegion={{
-          latitude: userLatitude,
-          longitude: userLongitude,
-          latitudeDelta: 0.2,
-          longitudeDelta: 0.2,
+    <>
+      <Map data={data} width={"100%"} height={"100%"} />
+      <TouchableOpacity
+        style={{
+          position: "absolute",
+          bottom: 15,
+          right: 15,
+          flexDirection: "row",
+          backgroundColor: "white",
+          padding: 5,
+          borderRadius: 5,
+          justifyContent: "space-between",
+          alignItems: "center",
         }}
-        showsUserLocation={true}
-        provider={PROVIDER_GOOGLE}
+        onPress={() => {
+          setActualShowing(actualShowing + 6);
+        }}
       >
-        {restaurants.map((data, index) => {
-          return (
-            <MapView.Marker
-              onPress={() => {
-                navigation.navigate("Restaurant", {
-                  data,
-                });
-              }}
-              key={index}
-              coordinate={{
-                latitude: data.location.lat,
-                longitude: data.location.lng,
-              }}
-            >
-              <Image
-                source={{
-                  uri:
-                    data.type === "vegan"
-                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
-                      : data.type === "vegetarian"
-                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
-                      : data.type === "Veg Store"
-                      ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
-                      : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
-                }}
-                style={{ height: 30, width: 30, borderRadius: 10 }}
-              />
-            </MapView.Marker>
-          );
-        })}
-      </MapView>
-    </View>
+        <Text
+          style={{
+            color: "#6e3fac",
+            borderColor: "#6e3fac",
+            borderRadius: 10,
+            padding: 3,
+            borderWidth: 1,
+            marginRight: 5,
+          }}
+        >
+          +
+        </Text>
+        <Text style={{ color: "#6e3fac" }}>CHARGER PLUS</Text>
+      </TouchableOpacity>
+    </>
   );
 };
 

@@ -18,6 +18,8 @@ import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { Rating } from "react-native-elements";
 import { getDistance } from "geolib";
+import Map from "../components/Map";
+import axios from "axios";
 
 // import ImageView from "react-native-image-viewing";
 
@@ -30,6 +32,7 @@ const RestaurantScreen = ({ route }) => {
   const [userLongitude, setUserLongitude] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [distance, setDistance] = useState(null);
+  const [data, setData] = useState(null);
 
   const color =
     route.params.data.type === "vegan"
@@ -39,6 +42,8 @@ const RestaurantScreen = ({ route }) => {
       : route.params.data.type === "Veg Store"
       ? "#ddc252"
       : "#49baaf";
+
+  const images = [];
 
   useEffect(async () => {
     let favorites = await AsyncStorage.getItem("favorites");
@@ -62,31 +67,43 @@ const RestaurantScreen = ({ route }) => {
         </TouchableOpacity>
       ),
     });
-    const getPermissionAndLocation = async () => {
-      const { status } = await Location.requestForegroundPermissionsAsync();
-      if (status === "granted") {
-        const location = await Location.getCurrentPositionAsync();
-        setUserLatitude(location.coords.latitude);
-        setUserLongitude(location.coords.longitude);
 
-        let newDistance = getDistance(
-          {
-            latitude: route.params.data.location.lat,
-            longitude: route.params.data.location.lng,
-          },
-          {
-            latitude: location.coords.latitude,
-            longitude: location.coords.longitude,
-          }
+    const fetchData = async () => {
+      try {
+        let newData = await axios.get(
+          `http://localhost:3000/restaurant/${route.params.data.placeId}`
         );
-        newDistance = Math.round((newDistance / 1000) * 100) / 100;
+        newData = newData.data[0];
+        setData(newData);
 
-        setDistance(newDistance);
+        newData.pictures.forEach((pic) => {
+          images.push({ uri: pic });
+        });
 
-        setIsLoading(false);
+        const { status } = await Location.requestForegroundPermissionsAsync();
+        if (status === "granted") {
+          const location = await Location.getCurrentPositionAsync();
+
+          let newDistance = getDistance(
+            {
+              latitude: route.params.data.location.lat,
+              longitude: route.params.data.location.lng,
+            },
+            {
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+            }
+          );
+          newDistance = Math.round((newDistance / 1000) * 100) / 100;
+
+          setDistance(newDistance);
+        }
+      } catch (error) {
+        console.log(error.message);
       }
     };
-    getPermissionAndLocation();
+    fetchData();
+    setIsLoading(false);
   }, [isFav]);
 
   const handleFavClic = async (id) => {
@@ -104,16 +121,11 @@ const RestaurantScreen = ({ route }) => {
     await AsyncStorage.setItem("favorites", splittedFav.join("-"));
   };
 
-  const images = [];
-  route.params.data.pictures.forEach((pic) => {
-    images.push({ uri: pic });
-  });
-
   const price = Math.floor(Math.random() * 3);
 
   return isLoading ? (
     <SplashScreen />
-  ) : (
+  ) : data ? (
     <ScrollView style={{ backgroundColor: "white" }}>
       <View style={styles.basicInfo}>
         {showAllImages ? (
@@ -122,7 +134,7 @@ const RestaurantScreen = ({ route }) => {
             showsHorizontalScrollIndicator={false}
             style={{ backgroundColor: color }}
           >
-            {route.params.data.pictures.map((pic, index) => {
+            {data.pictures.map((pic, index) => {
               return (
                 <Image
                   key={index}
@@ -138,13 +150,10 @@ const RestaurantScreen = ({ route }) => {
           </ScrollView>
         ) : (
           <View style={styles.pictures}>
-            <Image
-              source={{ uri: route.params.data.pictures[0] }}
-              style={styles.bigPic}
-            />
+            <Image source={{ uri: data.pictures[0] }} style={styles.bigPic} />
             <View>
               <Image
-                source={{ uri: route.params.data.pictures[1] }}
+                source={{ uri: data.pictures[1] }}
                 style={styles.sideTopPic}
               />
               <TouchableOpacity
@@ -153,12 +162,12 @@ const RestaurantScreen = ({ route }) => {
                 }}
               >
                 <ImageBackground
-                  source={{ uri: route.params.data.pictures[2] }}
+                  source={{ uri: data.pictures[2] }}
                   style={styles.sideBotPic}
                 >
                   <View style={styles.picsView}>
                     <Text style={styles.seeAllText}>
-                      +{route.params.data.pictures.length}
+                      +{data.pictures.length}
                     </Text>
                   </View>
                 </ImageBackground>
@@ -177,10 +186,10 @@ const RestaurantScreen = ({ route }) => {
         >
           <View style={styles.leftBasicData}>
             <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-              {route.params.data.name}
+              {data.name}
             </Text>
             <Rating
-              startingValue={route.params.data.rating}
+              startingValue={data.rating}
               imageSize={15}
               tintColor={color}
               readonly={true}
@@ -190,20 +199,20 @@ const RestaurantScreen = ({ route }) => {
             <Image
               source={{
                 uri:
-                  route.params.data.type === "vegan"
+                  data.type === "vegan"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
-                    : route.params.data.type === "vegetarian"
+                    : data.type === "vegetarian"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
-                    : route.params.data.type === "Veg Store"
+                    : data.type === "Veg Store"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
                     : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
               }}
               style={styles.typeLogo}
             />
-            <Text style={{ color: "white" }}>{route.params.data.type}</Text>
+            <Text style={{ color: "white" }}>{data.type}</Text>
             <Text style={{ fontSize: 12, color: "white" }}>{distance} km</Text>
 
-            {route.params.data.price && (
+            {data.price && (
               <View style={styles.priceRange}>
                 <Text style={{ color: "gold" }}>$</Text>
                 <Text style={{ color: price >= 1 ? "gold" : "grey" }}>$</Text>
@@ -214,8 +223,10 @@ const RestaurantScreen = ({ route }) => {
           </View>
         </View>
       </View>
-      <Text style={styles.moreInfo}>{route.params.data.description}</Text>
-      <MapView
+      <Text style={styles.moreInfo}>{data.description}</Text>
+      <Map data={data} height={50} width={"100%"} />
+
+      {/* <MapView
         style={{ width: "100%", height: 300 }}
         initialRegion={{
           latitude: userLatitude,
@@ -228,62 +239,64 @@ const RestaurantScreen = ({ route }) => {
       >
         <MapView.Marker
           coordinate={{
-            latitude: route.params.data.location.lat,
-            longitude: route.params.data.location.lng,
+            latitude: data.location.lat,
+            longitude: data.location.lng,
           }}
         >
           <Image
             source={{
               uri:
-                route.params.data.type === "vegan"
+                data.type === "vegan"
                   ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
-                  : route.params.data.type === "vegetarian"
+                  : data.type === "vegetarian"
                   ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
-                  : route.params.data.type === "Veg Store"
+                  : data.type === "Veg Store"
                   ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
                   : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
             }}
             style={{ height: 30, width: 30, borderRadius: 10 }}
           />
         </MapView.Marker>
-      </MapView>
-      {route.params.data.phone && (
+      </MapView> */}
+      {data.phone && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(`tel:${route.params.data.phone}`)}
+          onPress={() => Linking.openURL(`tel:${data.phone}`)}
         >
           <Ionicons name={"call-outline"} size={30} color={"#6e3fac"} />
-          <Text>Appeler {route.params.data.phone}</Text>
+          <Text>Appeler {data.phone}</Text>
         </TouchableOpacity>
       )}
-      {route.params.data.website && (
+      {data.website && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(route.params.data.website)}
+          onPress={() => Linking.openURL(data.website)}
         >
           <Ionicons name={"link-outline"} size={30} color={"#6e3fac"} />
           <Text>Site Internet</Text>
         </TouchableOpacity>
       )}
-      {route.params.data.facebook && (
+      {data.facebook && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(route.params.data.facebook)}
+          onPress={() => Linking.openURL(data.facebook)}
         >
           <Ionicons name={"logo-facebook"} size={30} color={"#6e3fac"} />
           <Text>Facebook</Text>
         </TouchableOpacity>
       )}
-      {route.params.data.instagram && (
+      {data.instagram && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(route.params.data.instagram)}
+          onPress={() => Linking.openURL(data.instagram)}
         >
           <Ionicons name={"logo-instagram"} size={30} color={"#6e3fac"} />
           <Text>Instagram</Text>
         </TouchableOpacity>
       )}
     </ScrollView>
+  ) : (
+    <SplashScreen />
   );
 };
 
