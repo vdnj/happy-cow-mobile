@@ -45,7 +45,7 @@ const Map = ({ data, width, height }) => {
             <MapView.Marker
               onPress={() => {
                 navigation.navigate("Restaurant", {
-                  el,
+                  data: el,
                 });
               }}
               key={index}

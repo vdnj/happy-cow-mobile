@@ -10,6 +10,7 @@ import {
 import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
+import axios from "axios";
 
 const SignUpScreen = ({ setToken }) => {
   const navigation = useNavigation();
@@ -23,6 +24,7 @@ const SignUpScreen = ({ setToken }) => {
   const [yearOfBirth, setYearOfBirth] = useState(null);
   const [isYearValid, setIsYearValid] = useState(null);
   const [isConditionAccepted, setIsConditionAccepted] = useState(null);
+  const [accountExists, setAccountExists] = useState(false);
 
   const validateEmail = (text) => {
     let reg = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w\w+)+$/;
@@ -37,6 +39,24 @@ const SignUpScreen = ({ setToken }) => {
       setIsYearValid(false);
     } else {
       setIsYearValid(true);
+    }
+  };
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("http://localhost:3000/user/signup", {
+        email,
+        password,
+        username,
+        vegStatus,
+        city,
+        yearOfBirth,
+      });
+      const userToken = response.data.token;
+      setToken(userToken);
+    } catch (error) {
+      setAccountExists(true);
+      console.log(error.message);
     }
   };
 
@@ -119,7 +139,7 @@ const SignUpScreen = ({ setToken }) => {
         <TextInput
           value={vegStatus}
           style={styles.input}
-          onValueChange={(itemValue, itemIndex) => setSelectedValue(itemValue)}
+          onChangeText={(text) => setVegStatus(text)}
           placeholder="Veg Status"
         />
       </View>
@@ -159,12 +179,16 @@ const SignUpScreen = ({ setToken }) => {
       )}
       <TouchableOpacity
         onPress={async () => {
-          const userToken = "secret-token";
-          setToken(userToken);
+          handleSubmit();
         }}
       >
         <Text style={styles.register}>Register</Text>
       </TouchableOpacity>
+      {accountExists && (
+        <Text style={{ color: "red" }}>
+          An account already exists with this email
+        </Text>
+      )}
       <TouchableOpacity
         onPress={async () => {
           navigation.navigate("SignIn");

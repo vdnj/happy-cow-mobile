@@ -11,13 +11,30 @@ import { Ionicons } from "@expo/vector-icons";
 import { useState } from "react";
 import { useNavigation } from "@react-navigation/native";
 import { setStatusBarNetworkActivityIndicatorVisible } from "expo-status-bar";
+import axios from "axios";
 
 const SignInScreen = ({ setToken }) => {
   const navigation = useNavigation();
 
-  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [isPassVisible, setIsPassVisible] = useState(false);
+  const [errorMessage, setErrorMessage] = useState(null);
+  const [isError, setIsError] = useState(false);
+
+  const handleSubmit = async () => {
+    try {
+      const response = await axios.post("http://localhost:3000/user/login", {
+        email,
+        password,
+      });
+      const userToken = response.data.token;
+      setToken(userToken);
+    } catch (error) {
+      console.log(error.message);
+      setIsError(true);
+    }
+  };
 
   return (
     <View style={styles.signInScreen}>
@@ -35,15 +52,15 @@ const SignInScreen = ({ setToken }) => {
       <View style={styles.searchSection}>
         <Ionicons
           style={styles.searchIcon}
-          name="person"
+          name="mail"
           size={20}
           color="#6e3fac"
         />
         <TextInput
-          value={username}
+          value={email}
           style={styles.input}
-          onChangeText={(text) => setUsername(text)}
-          placeholder="Username"
+          onChangeText={(text) => setEmail(text)}
+          placeholder="Email"
         />
       </View>
       <View style={styles.searchSection}>
@@ -67,14 +84,10 @@ const SignInScreen = ({ setToken }) => {
           secureTextEntry={isPassVisible ? false : true}
         />
       </View>
-      <TouchableOpacity
-        onPress={async () => {
-          const userToken = "secret-token";
-          setToken(userToken);
-        }}
-      >
+      <TouchableOpacity onPress={handleSubmit}>
         <Text style={styles.signIn}>Sign In</Text>
       </TouchableOpacity>
+      {isError && <Text style={{ color: "red" }}>Unauthorized</Text>}
       <TouchableOpacity
         onPress={async () => {
           navigation.navigate("SignUp");

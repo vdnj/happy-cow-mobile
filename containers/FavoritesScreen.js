@@ -34,7 +34,7 @@ const FavoritesScreen = () => {
       if (favorites) {
         try {
           let newData = await axios.get(
-            `http://localhost:3000/favorites?favorites=${favorites}`
+            `https://happy-cow-backend.herokuapp.com/favorites?favorites=${favorites}`
           );
           newData = newData.data;
           setData(newData);

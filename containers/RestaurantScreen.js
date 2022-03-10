@@ -71,12 +71,12 @@ const RestaurantScreen = ({ route }) => {
     const fetchData = async () => {
       try {
         let newData = await axios.get(
-          `http://localhost:3000/restaurant/${route.params.data.placeId}`
+          `https://happy-cow-backend.herokuapp.com/restaurant/${route.params.data.placeId}`
         );
-        newData = newData.data[0];
+        newData = newData.data;
         setData(newData);
 
-        newData.pictures.forEach((pic) => {
+        newData[0].pictures.forEach((pic) => {
           images.push({ uri: pic });
         });
 
@@ -134,7 +134,7 @@ const RestaurantScreen = ({ route }) => {
             showsHorizontalScrollIndicator={false}
             style={{ backgroundColor: color }}
           >
-            {data.pictures.map((pic, index) => {
+            {data[0].pictures.map((pic, index) => {
               return (
                 <Image
                   key={index}
@@ -150,10 +150,13 @@ const RestaurantScreen = ({ route }) => {
           </ScrollView>
         ) : (
           <View style={styles.pictures}>
-            <Image source={{ uri: data.pictures[0] }} style={styles.bigPic} />
+            <Image
+              source={{ uri: data[0].pictures[0] }}
+              style={styles.bigPic}
+            />
             <View>
               <Image
-                source={{ uri: data.pictures[1] }}
+                source={{ uri: data[0].pictures[1] }}
                 style={styles.sideTopPic}
               />
               <TouchableOpacity
@@ -162,12 +165,12 @@ const RestaurantScreen = ({ route }) => {
                 }}
               >
                 <ImageBackground
-                  source={{ uri: data.pictures[2] }}
+                  source={{ uri: data[0].pictures[2] }}
                   style={styles.sideBotPic}
                 >
                   <View style={styles.picsView}>
                     <Text style={styles.seeAllText}>
-                      +{data.pictures.length}
+                      +{data[0].pictures.length}
                     </Text>
                   </View>
                 </ImageBackground>
@@ -186,10 +189,10 @@ const RestaurantScreen = ({ route }) => {
         >
           <View style={styles.leftBasicData}>
             <Text style={{ color: "white", fontSize: 16, fontWeight: "bold" }}>
-              {data.name}
+              {data[0].name}
             </Text>
             <Rating
-              startingValue={data.rating}
+              startingValue={data[0].rating}
               imageSize={15}
               tintColor={color}
               readonly={true}
@@ -199,20 +202,20 @@ const RestaurantScreen = ({ route }) => {
             <Image
               source={{
                 uri:
-                  data.type === "vegan"
+                  data[0].type === "vegan"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
-                    : data.type === "vegetarian"
+                    : data[0].type === "vegetarian"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
-                    : data.type === "Veg Store"
+                    : data[0].type === "Veg Store"
                     ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
                     : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
               }}
               style={styles.typeLogo}
             />
-            <Text style={{ color: "white" }}>{data.type}</Text>
+            <Text style={{ color: "white" }}>{data[0].type}</Text>
             <Text style={{ fontSize: 12, color: "white" }}>{distance} km</Text>
 
-            {data.price && (
+            {data[0].price && (
               <View style={styles.priceRange}>
                 <Text style={{ color: "gold" }}>$</Text>
                 <Text style={{ color: price >= 1 ? "gold" : "grey" }}>$</Text>
@@ -223,72 +226,39 @@ const RestaurantScreen = ({ route }) => {
           </View>
         </View>
       </View>
-      <Text style={styles.moreInfo}>{data.description}</Text>
-      <Map data={data} height={50} width={"100%"} />
-
-      {/* <MapView
-        style={{ width: "100%", height: 300 }}
-        initialRegion={{
-          latitude: userLatitude,
-          longitude: userLongitude,
-          latitudeDelta: 0.2,
-          longitudeDelta: 0.2,
-        }}
-        showsUserLocation={true}
-        provider={PROVIDER_GOOGLE}
-      >
-        <MapView.Marker
-          coordinate={{
-            latitude: data.location.lat,
-            longitude: data.location.lng,
-          }}
-        >
-          <Image
-            source={{
-              uri:
-                data.type === "vegan"
-                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646406922/HappyCow/vegan.png"
-                  : data.type === "vegetarian"
-                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407750/HappyCow/vegetarian_h76kt4.png"
-                  : data.type === "Veg Store"
-                  ? "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407838/HappyCow/vegstore_sggr5o.png"
-                  : "https://res.cloudinary.com/dxla31aiu/image/upload/v1646407633/HappyCow/other_xbytay.png",
-            }}
-            style={{ height: 30, width: 30, borderRadius: 10 }}
-          />
-        </MapView.Marker>
-      </MapView> */}
-      {data.phone && (
+      <Text style={styles.moreInfo}>{data[0].description}</Text>
+      <Map data={data} height={200} width={"100%"} />
+      {data[0].phone && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(`tel:${data.phone}`)}
+          onPress={() => Linking.openURL(`tel:${data[0].phone}`)}
         >
           <Ionicons name={"call-outline"} size={30} color={"#6e3fac"} />
-          <Text>Appeler {data.phone}</Text>
+          <Text>Appeler {data[0].phone}</Text>
         </TouchableOpacity>
       )}
-      {data.website && (
+      {data[0].website && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(data.website)}
+          onPress={() => Linking.openURL(data[0].website)}
         >
           <Ionicons name={"link-outline"} size={30} color={"#6e3fac"} />
           <Text>Site Internet</Text>
         </TouchableOpacity>
       )}
-      {data.facebook && (
+      {data[0].facebook && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(data.facebook)}
+          onPress={() => Linking.openURL(data[0].facebook)}
         >
           <Ionicons name={"logo-facebook"} size={30} color={"#6e3fac"} />
           <Text>Facebook</Text>
         </TouchableOpacity>
       )}
-      {data.instagram && (
+      {data[0].instagram && (
         <TouchableOpacity
           style={styles.links}
-          onPress={() => Linking.openURL(data.instagram)}
+          onPress={() => Linking.openURL(data[0].instagram)}
         >
           <Ionicons name={"logo-instagram"} size={30} color={"#6e3fac"} />
           <Text>Instagram</Text>

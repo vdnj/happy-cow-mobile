@@ -25,7 +25,7 @@ const RestaurantsScreen = ({ navigation }) => {
     const fetchData = async () => {
       try {
         const data = await axios.get(
-          `http://localhost:3000/restaurants?filter=${filter}&actualShowing=${actualShowing}`
+          `https://happy-cow-backend.herokuapp.com/restaurants?filter=${filter}&actualShowing=${actualShowing}`
         );
         const newData = data.data;
         setData(newData);

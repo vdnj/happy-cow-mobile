@@ -21,7 +21,7 @@ const MapScreen = () => {
     const fetchData = async () => {
       try {
         const data = await axios.get(
-          `http://localhost:3000/restaurants?filter=null&actualShowing=${actualShowing}`
+          `https://happy-cow-backend.herokuapp.com/restaurants?filter=null&actualShowing=${actualShowing}`
         );
         const newData = data.data;
         setData(newData);
