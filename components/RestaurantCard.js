@@ -7,6 +7,8 @@ import SplashCard from "../components/SplashCard";
 import * as Location from "expo-location";
 
 const RestaurantCard = ({ data }) => {
+  console.log(data.price);
+
   const navigation = useNavigation();
   const [isLoading, setIsLoading] = useState(true);
   const [distance, setDistance] = useState(null);
@@ -35,8 +37,6 @@ const RestaurantCard = ({ data }) => {
     };
     getPermissionAndLocation();
   }, []);
-
-  const price = Math.floor(Math.random() * 3);
 
   return isLoading ? (
     <SplashCard />
@@ -90,13 +90,16 @@ const RestaurantCard = ({ data }) => {
               style={{ height: 20, width: 20, borderRadius: 10 }}
             />
             <Text style={{ fontSize: 12, color: "gray" }}>{distance} km</Text>
-            {data.price && (
-              <View style={styles.priceRange}>
-                <Text style={{ color: "gold" }}>$</Text>
-                <Text style={{ color: price >= 1 ? "gold" : "grey" }}>$</Text>
-                <Text style={{ color: price === 2 ? "gold" : "grey" }}>$</Text>
-              </View>
-            )}
+
+            <View style={styles.priceRange}>
+              <Text style={{ color: "gold" }}>$</Text>
+              <Text style={{ color: data.price >= 1 ? "gold" : "grey" }}>
+                $
+              </Text>
+              <Text style={{ color: data.price === 2 ? "gold" : "grey" }}>
+                $
+              </Text>
+            </View>
           </View>
         </View>
         <View style={styles.descBot}>

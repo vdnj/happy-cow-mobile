@@ -1,6 +1,4 @@
 Filtre par nom de restaurant
-login / signup
 handle location not alowed
-distance dans restaurantScreen
-Modifier tous les price du restaurants.json par 0,1 ou 2 aléatoirement et y accéder dans le restaurantCard et Screen pour qu'il ne se modifie plus
+Mettre des prix fixes
 Quand les restaurants chargent, afficher le 1er de la liste
